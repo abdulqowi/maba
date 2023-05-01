@@ -2,8 +2,6 @@
 
 namespace App;
 
-use App\Receipt;
-use App\UserDetail;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
