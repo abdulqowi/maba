@@ -24,4 +24,12 @@ class Product extends Model
     {
         return $this->category;
     }
+
+    public function media(){
+        return $this->belongsTo(Media::class);
+    }
+
+    public function user (){
+        return $this->belongsToMany(User::class,'user_products');
+    }
 }

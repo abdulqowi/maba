@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Media;
 use Exception;
 use App\product;
 use Illuminate\Http\Request;
@@ -22,6 +23,7 @@ class ProductController extends Controller
             $product->image = asset('assets/images/' . $product->image);
             $categories = $product->categories()->pluck('name');
             $product->categories = $categories;
+            $product->media = Media::where('product_id', $product->id)->first('url');
         }
 
         return apiResponse('200', 'Product', 'success', $products);
@@ -49,8 +51,8 @@ class ProductController extends Controller
                 'desc' => 'required',
                 'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'categories' => 'required',
-                'categories.*' => 'integer|exists:product_categories,id'
-
+                'categories.*' => 'integer|exists:product_categories,id',
+                'url' => 'required',
             ];
             $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
@@ -66,6 +68,10 @@ class ProductController extends Controller
             ]);
             $product->categories()->sync($request->categories);
 
+            $media = Media::create([
+                'url' => $request->url,
+                'product_id' => $product->id
+            ]);
 
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
@@ -79,6 +85,8 @@ class ProductController extends Controller
             $product->image = asset('assets/images/' . $product->image);
             $categories = $product->categories()->pluck('name');
             $product->categories = $categories;
+            $product->media = Media::where('product_id', $product->id)->first('url');
+
             return apiResponse('200', 'Product', 'Created :', $product);
         } catch (Exception $e) {
             return apiResponse('400', 'error', 'error', $e);
@@ -99,6 +107,8 @@ class ProductController extends Controller
                 $product->image = asset('assets/images/' . $product->image);
                 $categories = $product->categories()->pluck('name');
                 $product->categories = $categories;
+                $product->media = Media::where('product_id', $product->id)->first('url');
+
                 return apiResponse('200', 'Product', 'Detail :', $product);
             } else {
                 return apiResponse('404', 'error', 'Product not found', null);
@@ -137,7 +147,8 @@ class ProductController extends Controller
                 'quantity' => 'sometimes|required',
                 'desc' => 'sometimes|required',
                 'categories' => 'sometimes|required',
-                'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+                'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'url'  => 'sometimes|required',
             ];
 
             $validator = Validator::make($request->all(), $rules);
@@ -159,9 +170,14 @@ class ProductController extends Controller
                 $product->image = $name;
             }
             // Mendapatkan id kategori yang diinginkan dari request
-            $category_id = $request->input('category_id');
+            
+            $category_id = $request->input('categories');
             $product->categories()->detach();
             $product->categories()->attach($category_id);
+
+            $media = Media::where('product_id',$id)->first();
+            $media->url = $request->input('url');
+            $media->save();
 
             $product->name = $request->get('name', $product->name);
             $product->price = $request->get('price', $product->price);
@@ -172,6 +188,7 @@ class ProductController extends Controller
             $product->image = asset('assets/images/' . $product->image);
             $categories = $product->categories()->pluck('name');
             $product->categories = $categories;
+            $product->media = Media::where('product_id', $product->id)->first('url');
             return apiResponse(200, 'Product', 'Updated :', $product);
         } catch (Exception $e) {
             return apiResponse(400, 'error', 'error', $e);
@@ -194,8 +211,9 @@ class ProductController extends Controller
             if (file_exists($imagePath) && $product->image) {
                 unlink($imagePath);
             }
+            Media::where('product_id',$id)->delete();
             $product->delete();
-            return apiResponse('200', 'Product', 'Deleted', null);
+            return apiResponse('200', 'Product', 'Deleted');
         } catch (Exception $e) {
             return apiResponse('400', 'error', 'error', $e);
         }
