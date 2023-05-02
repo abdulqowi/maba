@@ -19,4 +19,9 @@ class Product extends Model
     {
         return $this->belongsToMany(Product::class, 'category_products');
     }
+
+    public function getCategoryNameAttribute()
+    {
+        return $this->category;
+    }
 }

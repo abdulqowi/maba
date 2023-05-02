@@ -15,7 +15,7 @@ class CategoryController extends Controller
     public function index()
     {
         $Category = Category::all();
-        return apiResponse('200','success','List :',$Category);
+        return apiResponse('200','success','Menampilkan Semua Data',$Category);
     }
 
     /**
@@ -51,7 +51,8 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        //
+        $data = Category::findOrFail($id);
+        return apiResponse('200','success','Menampilkan per Id',$data);
     }
 
     /**

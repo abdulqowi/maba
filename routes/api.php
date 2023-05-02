@@ -5,7 +5,9 @@ use Illuminate\Support\Facades\Route;
 require_once('includes/auth.php');
 
 Route::get('/category', 'CategoryController@index');
+Route::get('/category/{id}', 'CategoryController@show');
 Route::get('/product','ProductController@index'); 
+Route::get('/product/{id}','ProductController@show');
 Route::group(
     ['middleware' => 'auth:api'],
     function () {
