@@ -170,14 +170,21 @@ class ProductController extends Controller
                 $product->image = $name;
             }
             // Mendapatkan id kategori yang diinginkan dari request
-            
-            $category_id = $request->input('categories');
-            $product->categories()->detach();
-            $product->categories()->attach($category_id);
 
-            $media = Media::where('product_id',$id)->first();
-            $media->url = $request->input('url');
-            $media->save();
+            $category_id = $request->input('categories');
+
+            if ($category_id) {
+                $product->categories()->detach();
+                $product->categories()->attach($category_id);
+            }
+
+            $media = Media::where('product_id', $id)->first();
+            if ($media) {
+                if ($request->filled('url')) {
+                    $media->url = $request->input('url');
+                }
+                $media->save();
+            }
 
             $product->name = $request->get('name', $product->name);
             $product->price = $request->get('price', $product->price);
@@ -211,7 +218,7 @@ class ProductController extends Controller
             if (file_exists($imagePath) && $product->image) {
                 unlink($imagePath);
             }
-            Media::where('product_id',$id)->delete();
+            Media::where('product_id', $id)->delete();
             $product->delete();
             return apiResponse('200', 'Product', 'Deleted');
         } catch (Exception $e) {

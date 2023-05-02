@@ -21,6 +21,7 @@ class ProductSeeder extends Seeder
                 'price' => $faker->randomFloat(2, 1, 1000),
                 'quantity' => $faker->randomFloat(2, 1, 1000),
             ]);
+            
         }
     }
 }

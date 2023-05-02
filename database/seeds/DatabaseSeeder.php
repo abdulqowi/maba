@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             // NotificationSeeder::class,
             // MasterSeeder::class,
             ProductSeeder::class,
+            MediaSeeder::class,
             // CourseSeeder::class,
             CategoryProductSeeder::class,
         ]);
